@@ -16,7 +16,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     REDIS_URL: str = "redis://localhost:6379"
-    CORS_ORIGINS: List[str] = ["*"]
+    CORS_ORIGINS: List[str] = [
+        "https://website-ebon-three-59.vercel.app",
+        "https://madavpn-api.azurewebsites.net",
+        "http://localhost:3000",
+        "http://localhost:8000",
+    ]
     GO_PROXY_URL: str = "http://go-proxy:8080"
     WS_TUNNEL_URL: str = "http://node-tunnel:3001"
 

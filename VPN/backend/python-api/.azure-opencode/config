@@ -1,0 +1,7 @@
+[defaults]
+group = rg-madavpn2
+sku = B1
+appserviceplan = 16491_asp_5680
+location = germanywestcentral
+web = madavpn-api
+

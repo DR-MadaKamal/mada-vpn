@@ -12,8 +12,6 @@ from app.core.background import server_health_ping_loop, connection_log_prune_lo
 from app.core.rate_limiter import rate_limiter
 from app.routes import auth, users, servers, subscriptions, admin, analytics, wireguard
 
-Base.metadata.create_all(bind=engine)
-
 logger = logging.getLogger("uvicorn.main")
 
 
@@ -149,14 +147,13 @@ def seed_database():
     finally:
         db.close()
 
-seed_database()
-
-
 background_tasks = []
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    seed_database()
     for loop_fn in [server_health_ping_loop, connection_log_prune_loop, bandwidth_quota_reset_loop]:
         task = asyncio.create_task(loop_fn())
         background_tasks.append(task)
