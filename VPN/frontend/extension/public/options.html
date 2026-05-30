@@ -17,50 +17,46 @@
     .row .desc { font-size: 12px; color: #64748b; margin-top: 2px; }
     input[type="text"], input[type="password"], select { background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; width: 200px; }
     input:focus, select:focus { border-color: #6366f1; }
-    .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #334155; border-radius: 22px; transition: 0.3s; }
-    .slider:before { content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
-    input:checked + .slider { background: #6366f1; }
-    input:checked + .slider:before { transform: translateX(18px); }
+    .badge { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(234,179,8,0.15); color: #eab308; margin-left: 8px; font-weight: 600; text-transform: uppercase; }
     .btn { background: #6366f1; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .btn:hover { background: #4f46e5; }
-    .btn-danger { background: #ef4444; }
-    .btn-danger:hover { background: #dc2626; }
+    .btn-secondary { background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 10px 24px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
     .status { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; }
     .status.success { display: block; background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
-    .status.error { display: block; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
     .status.info { display: block; background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3); }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>⚙️ SecureVPN Settings</h1>
+    <h1>⚙️ MadaVPN Settings</h1>
 
     <div class="section">
-      <h2>Authentication</h2>
+      <h2>Dashboard</h2>
+      <div class="row">
+        <div>
+          <label>API Server URL</label>
+          <div class="desc">Backend API address used by the extension</div>
+        </div>
+        <input type="text" id="apiUrl" value="https://madavpn-api.azurewebsites.net" placeholder="https://madavpn-api.azurewebsites.net" style="width:280px">
+      </div>
+    </div>
+
+    <div class="section" style="opacity:0.5;">
+      <h2>Proxy (Coming Soon) <span class="badge">Not Active</span></h2>
+      <p style="font-size:13px;color:#64748b;margin-bottom:16px;">These settings will apply when proxy server infrastructure is deployed.</p>
       <div class="row">
         <div>
           <label>API Token</label>
           <div class="desc">Your authentication token from the dashboard</div>
         </div>
-        <input type="password" id="apiToken" placeholder="Enter your token" style="width:220px">
+        <input type="password" id="apiToken" placeholder="Enter your token" style="width:220px" disabled>
       </div>
-      <div class="row">
-        <div>
-          <label>Auto-login on browser start</label>
-        </div>
-        <label class="switch"><input type="checkbox" id="autoLogin"><span class="slider"></span></label>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Connection</h2>
       <div class="row">
         <div>
           <label>Default Protocol</label>
         </div>
-        <select id="defaultProtocol">
+        <select id="defaultProtocol" disabled>
           <option value="http">HTTP Proxy</option>
           <option value="socks5">SOCKS5</option>
           <option value="ws">WebSocket Tunnel</option>
@@ -68,48 +64,30 @@
       </div>
       <div class="row">
         <div>
-          <label>API Server URL</label>
-          <div class="desc">Backend API address (default: http://localhost:8000)</div>
+          <label>Custom Proxy Server</label>
+          <div class="desc">Override auto-selected server</div>
         </div>
-        <input type="text" id="apiUrl" value="http://localhost:8000/api/v1" placeholder="http://localhost:8000/api/v1" style="width:220px">
+        <input type="text" id="customServer" placeholder="proxy.example.com" style="width:220px" disabled>
       </div>
       <div class="row">
         <div>
-          <label>Custom Proxy Server</label>
-          <div class="desc">Leave empty for auto-select</div>
+          <label>Kill Switch</label>
+          <div class="desc">Block traffic if VPN disconnects</div>
         </div>
-        <input type="text" id="customServer" placeholder="proxy.example.com" style="width:220px">
+        <input type="checkbox" id="killSwitch" checked disabled>
       </div>
       <div class="row">
         <div>
           <label>Block DNS leaks</label>
           <div class="desc">Force DNS through VPN tunnel</div>
         </div>
-        <label class="switch"><input type="checkbox" id="dnsLeakProtection" checked><span class="slider"></span></label>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Privacy</h2>
-      <div class="row">
-        <div>
-          <label>Kill Switch</label>
-          <div class="desc">Block traffic if VPN disconnects</div>
-        </div>
-        <label class="switch"><input type="checkbox" id="killSwitch" checked><span class="slider"></span></label>
-      </div>
-      <div class="row">
-        <div>
-          <label>IP Leak Protection</label>
-          <div class="desc">Block WebRTC and IPv6 leaks</div>
-        </div>
-        <label class="switch"><input type="checkbox" id="ipLeakProtection" checked><span class="slider"></span></label>
+        <input type="checkbox" id="dnsLeakProtection" checked disabled>
       </div>
     </div>
 
     <div style="display:flex; gap:12px; margin-top:8px;">
       <button class="btn" id="saveBtn">Save Settings</button>
-      <button class="btn btn-danger" id="resetBtn">Reset to Defaults</button>
+      <button class="btn-secondary" id="resetBtn">Reset to Defaults</button>
     </div>
 
     <div id="statusMsg" class="status"></div>
@@ -117,37 +95,24 @@
 
   <script>
     function loadSettings() {
-      chrome.storage.sync.get([
-        'apiToken', 'autoLogin', 'defaultProtocol', 'apiUrl', 'customServer',
-        'dnsLeakProtection', 'killSwitch', 'ipLeakProtection'
-      ], (items) => {
-        if (items.apiToken) document.getElementById('apiToken').value = items.apiToken;
-        document.getElementById('autoLogin').checked = items.autoLogin || false;
-        if (items.defaultProtocol) document.getElementById('defaultProtocol').value = items.defaultProtocol;
+      chrome.storage.sync.get(['apiUrl'], (items) => {
         if (items.apiUrl) document.getElementById('apiUrl').value = items.apiUrl;
-        if (items.customServer) document.getElementById('customServer').value = items.customServer;
-        document.getElementById('dnsLeakProtection').checked = items.dnsLeakProtection !== false;
-        document.getElementById('killSwitch').checked = items.killSwitch !== false;
-        document.getElementById('ipLeakProtection').checked = items.ipLeakProtection !== false;
       });
     }
 
     document.getElementById('saveBtn').addEventListener('click', () => {
-      const settings = {
-        apiToken: document.getElementById('apiToken').value,
-        autoLogin: document.getElementById('autoLogin').checked,
-        defaultProtocol: document.getElementById('defaultProtocol').value,
-        apiUrl: document.getElementById('apiUrl').value,
-        customServer: document.getElementById('customServer').value,
-        dnsLeakProtection: document.getElementById('dnsLeakProtection').checked,
-        killSwitch: document.getElementById('killSwitch').checked,
-        ipLeakProtection: document.getElementById('ipLeakProtection').checked,
-      };
-
-      chrome.storage.sync.set(settings, () => {
+      const apiUrl = document.getElementById('apiUrl').value.trim();
+      if (!apiUrl) {
+        const msg = document.getElementById('statusMsg');
+        msg.className = 'status info';
+        msg.textContent = 'Please enter an API Server URL';
+        setTimeout(() => { msg.className = 'status'; }, 3000);
+        return;
+      }
+      chrome.storage.sync.set({ apiUrl: apiUrl.replace(/\/+$/, '') }, () => {
         const msg = document.getElementById('statusMsg');
         msg.className = 'status success';
-        msg.textContent = 'Settings saved successfully!';
+        msg.textContent = 'Settings saved! Reload the extension popup to apply.';
         setTimeout(() => { msg.className = 'status'; }, 3000);
       });
     });
@@ -157,7 +122,7 @@
         loadSettings();
         const msg = document.getElementById('statusMsg');
         msg.className = 'status info';
-        msg.textContent = 'Settings reset to defaults';
+        msg.textContent = 'Reset to defaults';
         setTimeout(() => { msg.className = 'status'; }, 3000);
       });
     });
