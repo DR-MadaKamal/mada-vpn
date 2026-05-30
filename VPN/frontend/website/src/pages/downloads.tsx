@@ -23,7 +23,7 @@ export default function DownloadsPage() {
                 <h2 className="text-xl font-semibold mb-2">Chrome Extension</h2>
                 <p className="text-gray-400 mb-4">Proxy-based VPN that runs directly in your browser. Supports obfuscation, DNS-over-HTTPS, split tunneling, and kill switch.</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href="https://github.com/DR-MadaKamal/mada-vpn/releases/download/v1.0.0/madavpn-extension-v1.0.0.zip" target="_blank" className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                  <a href="/madavpn-extension-v1.0.0.zip" target="_blank" className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
                     <Download className="h-4 w-4" /> Download .zip
                   </a>
                   <a href="https://github.com/DR-MadaKamal/mada-vpn/tree/main/frontend/extension" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
