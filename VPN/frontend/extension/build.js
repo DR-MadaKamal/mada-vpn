@@ -26,8 +26,4 @@ const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
 </svg>`;
 fs.writeFileSync(path.join(DIST, 'icons', 'icon.svg'), iconSvg);
 
-for (const size of [16, 48, 128]) {
-  fs.writeFileSync(path.join(DIST, 'icons', `icon${size}.png`), Buffer.alloc(0));
-}
-
 console.log(`Extension built: ${DIST}`);

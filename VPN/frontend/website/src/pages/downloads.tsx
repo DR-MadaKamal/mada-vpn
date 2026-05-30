@@ -23,10 +23,12 @@ export default function DownloadsPage() {
                 <h2 className="text-xl font-semibold mb-2">Chrome Extension</h2>
                 <p className="text-gray-400 mb-4">Proxy-based VPN that runs directly in your browser. Supports obfuscation, DNS-over-HTTPS, split tunneling, and kill switch.</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href="https://github.com/mada-dev/mada-vpn/tree/main/frontend/extension" target="_blank" rel="noopener noreferrer" className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                  <a href="https://github.com/DR-MadaKamal/mada-vpn/releases/download/v1.0.0/madavpn-extension-v1.0.0.zip" target="_blank" className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                    <Download className="h-4 w-4" /> Download .zip
+                  </a>
+                  <a href="https://github.com/DR-MadaKamal/mada-vpn/tree/main/frontend/extension" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
                     <ExternalLink className="h-4 w-4" /> View Source
                   </a>
-                  <span className="text-gray-500 text-sm py-2">Build: <code className="bg-white/10 px-2 py-1 rounded">cd frontend/extension && npm install && node build.js</code></span>
                 </div>
               </div>
             </div>
@@ -39,7 +41,7 @@ export default function DownloadsPage() {
                 <h2 className="text-xl font-semibold mb-2">Desktop App — Windows</h2>
                 <p className="text-gray-400 mb-4">System tray VPN app with WireGuard integration, system proxy, and full feature support.</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href="https://github.com/mada-dev/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                  <a href="https://github.com/DR-MadaKamal/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-sky-600 hover:bg-sky-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
                     <Download className="h-4 w-4" /> Download .exe
                   </a>
                   <span className="text-gray-500 text-sm py-2">Or run from source: <code className="bg-white/10 px-2 py-1 rounded">cd frontend/desktop && npm install && npm start</code></span>
@@ -55,7 +57,7 @@ export default function DownloadsPage() {
                 <h2 className="text-xl font-semibold mb-2">Desktop App — macOS</h2>
                 <p className="text-gray-400 mb-4">Native macOS app with menu bar integration, system-wide kill switch, and WireGuard.</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href="https://github.com/mada-dev/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                  <a href="https://github.com/DR-MadaKamal/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
                     <Download className="h-4 w-4" /> Download .dmg
                   </a>
                 </div>
@@ -70,7 +72,7 @@ export default function DownloadsPage() {
                 <h2 className="text-xl font-semibold mb-2">Desktop App — Linux</h2>
                 <p className="text-gray-400 mb-4">Linux AppImage for all major distributions. Full WireGuard and proxy support.</p>
                 <div className="flex flex-wrap gap-3">
-                  <a href="https://github.com/mada-dev/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                  <a href="https://github.com/DR-MadaKamal/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
                     <Download className="h-4 w-4" /> Download .AppImage
                   </a>
                 </div>
@@ -80,7 +82,7 @@ export default function DownloadsPage() {
         </div>
 
         <div className="mt-10 text-center">
-          <a href="https://github.com/mada-dev/mada-vpn" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition">
+          <a href="https://github.com/DR-MadaKamal/mada-vpn" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition">
             <Github className="h-5 w-5" /> View on GitHub — All source code and releases
           </a>
         </div>

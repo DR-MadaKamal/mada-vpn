@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('openDashboard')?.addEventListener('click', (e) => {
     e.preventDefault();
     chrome.storage.sync.get(['apiUrl'], (res) => {
-      const base = (res.apiUrl || 'http://localhost:3000').replace(/\/+$/, '');
+      const base = (res.apiUrl || 'https://website-ebon-three-59.vercel.app').replace(/\/+$/, '');
       chrome.tabs.create({ url: `${base}/dashboard` });
     });
   });

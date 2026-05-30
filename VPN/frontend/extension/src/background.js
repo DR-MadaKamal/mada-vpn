@@ -1,4 +1,4 @@
-const DEFAULT_API = 'http://localhost:8000/api/v1';
+const DEFAULT_API = 'https://madavpn-api.azurewebsites.net/api/v1';
 let API_BASE = DEFAULT_API;
 
 chrome.storage.sync.get(['apiUrl'], (res) => {
