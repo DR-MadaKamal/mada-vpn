@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SecureVPN</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #fff; overflow: hidden; user-select: none; }
+    .titlebar { -webkit-app-region: drag; height: 36px; background: #0a0f1e; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; border-bottom: 1px solid #1e293b; }
+    .titlebar .title { font-size: 12px; color: #64748b; font-weight: 500; }
+    .titlebar .controls { -webkit-app-region: no-drag; display: flex; gap: 8px; }
+    .titlebar .controls button { background: none; border: none; color: #64748b; cursor: pointer; padding: 2px 6px; font-size: 14px; border-radius: 4px; }
+    .titlebar .controls button:hover { background: #1e293b; color: #fff; }
+    .container { padding: 24px; }
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+    .header .logo { width: 40px; height: 40px; background: #6366f1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .header h1 { font-size: 20px; font-weight: 700; }
+    .status-ring { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; border: 4px solid #1e293b; transition: all 0.5s; }
+    .status-ring.connected { border-color: #22c55e; box-shadow: 0 0 40px rgba(34, 197, 94, 0.2); }
+    .status-ring .icon { font-size: 48px; }
+    .status-text { text-align: center; font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .status-sub { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 24px; }
+    .btn-main { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; }
+    .btn-main.connect { background: #22c55e; color: #fff; }
+    .btn-main.connect:hover { background: #16a34a; }
+    .btn-main.disconnect { background: #ef4444; color: #fff; }
+    .btn-main.disconnect:hover { background: #dc2626; }
+    .error-msg { display: none; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 8px 12px; font-size: 12px; margin: 8px 0; }
+    .options { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; }
+    .option-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+    .option-row:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .option-row label { font-size: 14px; color: #cbd5e1; }
+    .option-row select { background: #1e293b; color: #fff; border: 1px solid #334155; border-radius: 8px; padding: 6px 10px; font-size: 13px; outline: none; }
+    .option-row select:focus { border-color: #6366f1; }
+    .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #334155; border-radius: 24px; transition: 0.3s; }
+    .slider:before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+    input:checked + .slider { background: #6366f1; }
+    input:checked + .slider:before { transform: translateX(20px); }
+  </style>
+</head>
+<body>
+  <div class="titlebar">
+    <span class="title">SecureVPN</span>
+    <div class="controls">
+      <button onclick="window.vpnAPI.minimize()">─</button>
+      <button onclick="window.vpnAPI.close()">✕</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo">🛡</div>
+      <h1>SecureVPN</h1>
+    </div>
+
+    <div id="statusRing" class="status-ring">
+      <span class="icon">🔴</span>
+    </div>
+    <div id="statusText" class="status-text">Disconnected</div>
+    <div id="statusSub" class="status-sub">Your traffic is not protected</div>
+
+    <button id="mainBtn" class="btn-main connect">Connect</button>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <div class="options">
+      <div class="option-row">
+        <label>Protocol</label>
+        <select id="protocolSelect">
+          <option value="http">HTTP Proxy</option>
+          <option value="socks5">SOCKS5</option>
+          <option value="ws">WebSocket Tunnel</option>
+          <option value="wireguard">WireGuard</option>
+        </select>
+      </div>
+      <div class="option-row">
+        <label>Server</label>
+        <select id="serverSelect">
+          <option value="">Auto-select</option>
+        </select>
+      </div>
+      <div class="option-row">
+        <label>Auto-connect</label>
+        <label class="switch">
+          <input type="checkbox" id="autoConnect">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="option-row">
+        <label>Kill Switch</label>
+        <label class="switch">
+          <input type="checkbox" id="killSwitch" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const api = window.vpnAPI;
+    let isConnected = false;
+
+    const statusRing = document.getElementById('statusRing');
+    const statusText = document.getElementById('statusText');
+    const statusSub = document.getElementById('statusSub');
+    const mainBtn = document.getElementById('mainBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const protocolSelect = document.getElementById('protocolSelect');
+    const serverSelect = document.getElementById('serverSelect');
+    const autoConnectBox = document.getElementById('autoConnect');
+    const killSwitchBox = document.getElementById('killSwitch');
+
+    function showError(msg) {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = 'block';
+      setTimeout(() => { errorMsg.style.display = 'none'; }, 4000);
+    }
+
+    function updateUI(connected) {
+      isConnected = connected;
+      statusRing.className = `status-ring ${connected ? 'connected' : ''}`;
+      statusRing.querySelector('.icon').textContent = connected ? '🟢' : '🔴';
+      statusText.textContent = connected ? 'Connected' : 'Disconnected';
+      statusSub.textContent = connected
+        ? 'Your traffic is encrypted and protected'
+        : 'Your traffic is not protected';
+      mainBtn.textContent = connected ? 'Disconnect' : 'Connect';
+      mainBtn.className = `btn-main ${connected ? 'disconnect' : 'connect'}`;
+    }
+
+    mainBtn.addEventListener('click', async () => {
+      mainBtn.disabled = true;
+      try {
+        const result = isConnected ? await api.disconnect() : await api.connect();
+        if (result.success) updateUI(!isConnected);
+        else showError(result.error || 'Operation failed');
+      } catch (err) {
+        showError(err.message);
+      }
+      mainBtn.disabled = false;
+    });
+
+    protocolSelect.addEventListener('change', () => api.setProtocol(protocolSelect.value));
+    serverSelect.addEventListener('change', () => api.setServer(serverSelect.value));
+    autoConnectBox.addEventListener('change', () => api.setAutoConnect(autoConnectBox.checked));
+    killSwitchBox.addEventListener('change', () => api.setKillSwitch(killSwitchBox.checked));
+
+    api.onTrayConnect(async () => {
+      const result = await api.connect();
+      if (result.success) updateUI(true);
+    });
+
+    api.onTrayDisconnect(async () => {
+      const result = await api.disconnect();
+      if (result.success) updateUI(false);
+    });
+
+    api.onAutoConnect(async () => {
+      const result = await api.connect();
+      if (result.success) updateUI(true);
+    });
+
+    async function loadState() {
+      const state = await api.getState();
+      if (state) {
+        updateUI(state.connected);
+        protocolSelect.value = state.protocol || 'http';
+        autoConnectBox.checked = state.autoConnect || false;
+        killSwitchBox.checked = state.killSwitch !== false;
+      }
+    }
+
+    loadState();
+  </script>
+</body>
+</html>

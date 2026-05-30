@@ -1,0 +1,13 @@
+{
+  "name": "securevpn-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SecureVPN Browser Extension",
+  "scripts": {
+    "build": "node build.js",
+    "watch": "node build.js --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.1"
+  }
+}

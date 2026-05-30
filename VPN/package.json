@@ -1,0 +1,17 @@
+{
+  "name": "securevpn",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-protocol VPN platform - Go/Python/Node.js",
+  "scripts": {
+    "dev:go-proxy": "cd backend/go-proxy && go run ./cmd/server",
+    "dev:python-api": "cd backend/python-api && uvicorn app.main:app --reload --port 8000",
+    "dev:node-tunnel": "cd backend/node-tunnel && npm run dev",
+    "dev:website": "cd frontend/website && npm run dev",
+    "dev:desktop": "cd frontend/desktop && npm run dev",
+    "build:extension": "cd frontend/extension && npm run build",
+    "build:desktop": "cd frontend/desktop && npm run build",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  }
+}

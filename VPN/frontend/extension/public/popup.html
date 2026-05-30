@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { width: 360px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #fff; }
+    .container { padding: 20px; }
+    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .header .logo { width: 36px; height: 36px; background: #6366f1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .status-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px; }
+    .status-card .status-icon { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .status-card .connected { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+    .status-card .disconnected { background: rgba(100, 116, 139, 0.2); color: #64748b; }
+    .status-card .status-text { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .status-card .status-sub { font-size: 12px; color: #94a3b8; }
+    .btn-connect { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .btn-connect.enabled { background: #ef4444; color: #fff; }
+    .btn-connect.disabled { background: #22c55e; color: #fff; }
+    .btn-connect:hover { opacity: 0.9; }
+    .server-select { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 14px; margin-bottom: 12px; outline: none; }
+    .server-select option { background: #1e293b; color: #fff; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+    .stat-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; text-align: center; }
+    .stat-box .value { font-size: 14px; font-weight: 600; }
+    .stat-box .label { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .protocol-selector { display: flex; gap: 6px; margin-bottom: 12px; }
+    .protocol-btn { flex: 1; padding: 8px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: transparent; color: #94a3b8; font-size: 11px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .protocol-btn.active { background: rgba(99, 102, 241, 0.2); border-color: #6366f1; color: #818cf8; }
+    .footer { margin-top: 12px; display: flex; justify-content: space-between; }
+    .footer a { color: #64748b; font-size: 12px; text-decoration: none; }
+    .footer a:hover { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🛡</div>
+      <h1>SecureVPN</h1>
+    </div>
+
+    <div class="status-card">
+      <div id="statusIcon" class="status-icon disconnected">🔴</div>
+      <div id="statusText" class="status-text">Disconnected</div>
+      <div id="statusSub" class="status-sub">Your traffic is not protected</div>
+    </div>
+
+    <button id="connectBtn" class="btn-connect disabled">Connect</button>
+
+    <div id="errorMsg" style="display:none; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 8px 12px; font-size: 12px; margin: 8px 0;"></div>
+
+    <div class="stats" id="statsSection" style="display:none">
+      <div class="stat-box">
+        <div class="value" id="dataUsed">0 MB</div>
+        <div class="label">Data Used</div>
+      </div>
+      <div class="stat-box">
+        <div class="value" id="sessionTime">00:00</div>
+        <div class="label">Session Time</div>
+      </div>
+    </div>
+
+    <div id="controlsSection" style="margin-top: 12px;">
+      <div class="protocol-selector">
+        <button class="protocol-btn active" data-proto="http">HTTP</button>
+        <button class="protocol-btn" data-proto="socks5">SOCKS5</button>
+        <button class="protocol-btn" data-proto="ws">WebSocket</button>
+      </div>
+
+      <select id="serverSelect" class="server-select">
+        <option value="">Select a server...</option>
+      </select>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 0; margin-top:8px; border-top:1px solid rgba(255,255,255,0.06);">
+      <label style="font-size:12px; color:#94a3b8; display:flex; align-items:center; gap:6px; cursor:pointer;">
+        <input type="checkbox" id="killSwitchToggle" checked style="accent-color:#6366f1;">
+        Kill Switch
+      </label>
+      <span style="font-size:10px; color:#64748b;">Blocks traffic if disconnected</span>
+    </div>
+
+    <div class="footer">
+      <a href="#" id="openOptions">⚙️ Settings</a>
+      <a href="#" id="openDashboard">📊 Dashboard</a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

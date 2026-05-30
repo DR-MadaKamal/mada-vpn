@@ -1,0 +1,33 @@
+server:
+  http_proxy_port: 8080
+  socks5_port: 1080
+  websocket_port: 8081
+  wireguard_port: 51820
+  
+proxy:
+  max_connections: 10000
+  timeout_seconds: 300
+  buffer_size: 32768
+  allowed_countries: []
+  blocked_domains: []
+  
+tls:
+  enabled: true
+  cert_file: /etc/ssl/certs/vpn.crt
+  key_file: /etc/ssl/private/vpn.key
+  
+auth:
+  mode: api    # api, token, none
+  api_url: http://python-api:8000/api/v1/auth/verify
+  
+wireguard:
+  interface: wg0
+  subnet: 10.0.0.0/24
+  private_key: /etc/wireguard/server.key
+  dns_servers:
+    - 1.1.1.1
+    - 8.8.8.8
+  
+logging:
+  level: info
+  format: json

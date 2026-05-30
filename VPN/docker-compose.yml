@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  go-proxy:
+    build:
+      context: ./backend/go-proxy
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "1080:1080"
+      - "8081:8081"
+      - "51820:51820/udp"
+      - "9090:9090"
+    environment:
+      - CONFIG_PATH=/app/config.yaml
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./backend/go-proxy/config.yaml:/app/config.yaml
+      - ./data/wireguard:/etc/wireguard
+    depends_on:
+      redis:
+        condition: service_healthy
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - vpn-net
+
+  python-api:
+    build:
+      context: ./backend/python-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://vpnuser:${POSTGRES_PASSWORD:-vpnpass}@postgres:5432/vpndb
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - vpn-net
+
+  node-tunnel:
+    build:
+      context: ./backend/node-tunnel
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - API_URL=http://python-api:8000
+      - REDIS_URL=redis://redis:6379
+      - WS_SECRET=${WS_SECRET}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - vpn-net
+
+  website:
+    build:
+      context: ./frontend/website
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - python-api
+    restart: unless-stopped
+    networks:
+      - vpn-net
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: vpnuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vpnpass}
+      POSTGRES_DB: vpndb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vpnuser -d vpndb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - vpn-net
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - vpn-net
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf
+      - ./deploy/ssl:/etc/nginx/ssl
+    depends_on:
+      go-proxy:
+        condition: service_started
+      python-api:
+        condition: service_started
+      website:
+        condition: service_started
+      node-tunnel:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - vpn-net
+
+networks:
+  vpn-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

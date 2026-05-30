@@ -1,0 +1,42 @@
+{
+  "name": "securevpn-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SecureVPN Desktop Application",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "dependencies": {
+    "electron-store": "^8.1.0",
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "electron": "^28.2.2",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.securevpn.desktop",
+    "productName": "SecureVPN",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "public/icon.png"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "public/icon.png"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "icon": "public/icon.png"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+*.exe
+dist/
+build/
+.next/
+.vite/
+*.log
+*.key
+*.pem
+wireguard-configs/
+venv/
+.venv/
+*.db
