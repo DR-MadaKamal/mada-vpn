@@ -31,7 +31,7 @@ def _serialize_server(s):
     }
 
 
-@router.get("/")
+@router.get("")
 async def list_servers(db: Session = Depends(get_db)):
     servers = db.query(Server).filter(Server.is_active == True).all()
     return [_serialize_server(s) for s in servers]
