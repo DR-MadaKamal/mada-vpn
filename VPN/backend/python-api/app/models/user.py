@@ -38,6 +38,9 @@ class User(Base):
     obfuscation = Column(String, default="none")
     theme = Column(String, default="dark")
     organization_id = Column(Integer, default=0)
+    email_verified = Column(Boolean, default=False)
+    email_verification_token = Column(String, default="")
+    last_quota_reset_month = Column(String, default="")
     # --- New fields for features 43-100 ---
     dns_over_https = Column(Boolean, default=False)
     bandwidth_saver = Column(Boolean, default=False)
@@ -378,4 +381,25 @@ class SmartDNSRule(Base):
     domain = Column(String, nullable=False)
     target_server = Column(String, default="")
     enabled = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    token = Column(String, unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UsedRefreshToken(Base):
+    __tablename__ = "used_refresh_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, index=True)
+    token_jti = Column(String, unique=True, nullable=False, index=True)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

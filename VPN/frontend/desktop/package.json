@@ -1,8 +1,8 @@
 {
-  "name": "securevpn-desktop",
+  "name": "madavpn-desktop",
   "version": "1.0.0",
   "private": true,
-  "description": "SecureVPN Desktop Application",
+  "description": "MadaVPN Desktop Application",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
@@ -21,8 +21,8 @@
     "electron-builder": "^24.13.3"
   },
   "build": {
-    "appId": "com.securevpn.desktop",
-    "productName": "SecureVPN",
+    "appId": "com.madavpn.desktop",
+    "productName": "MadaVPN",
     "directories": {
       "output": "dist"
     },

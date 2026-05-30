@@ -117,7 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('openDashboard')?.addEventListener('click', (e) => {
     e.preventDefault();
-    chrome.tabs.create({ url: 'http://localhost:3000/dashboard' });
+    chrome.storage.sync.get(['apiUrl'], (res) => {
+      const base = (res.apiUrl || 'http://localhost:3000').replace(/\/+$/, '');
+      chrome.tabs.create({ url: `${base}/dashboard` });
+    });
   });
 
   serverSelect.innerHTML = '<option value="">Loading servers...</option>';

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SecureVPN",
+  "name": "MadaVPN",
   "version": "1.0.0",
-  "description": "Secure, fast, and reliable VPN proxy extension. Bypass censorship and protect your privacy.",
+  "description": "Open source VPN proxy extension. Bypass censorship and protect your privacy.",
   "permissions": [
     "proxy",
     "storage",

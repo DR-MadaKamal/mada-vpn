@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+import uuid
 import jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
@@ -31,7 +32,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 def create_refresh_token(user_id: int) -> str:
     expire = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     return jwt.encode(
-        {"sub": str(user_id), "type": "refresh", "exp": expire},
+        {"sub": str(user_id), "type": "refresh", "jti": uuid.uuid4().hex, "exp": expire},
         settings.JWT_SECRET,
         algorithm=settings.JWT_ALGORITHM,
     )

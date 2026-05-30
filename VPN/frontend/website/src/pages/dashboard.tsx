@@ -1681,6 +1681,7 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-500">No tunnel health reports yet.</p>
                   )}
                 </div>
+              </div>
             )}
 
             {activeTab === 'connections' && (

@@ -1,6 +1,10 @@
 const DEFAULT_API = 'http://localhost:8000/api/v1';
 let API_BASE = DEFAULT_API;
 
+chrome.storage.sync.get(['apiUrl'], (res) => {
+  if (res.apiUrl) API_BASE = res.apiUrl.replace(/\/+$/, '') + '/api/v1';
+});
+
 let state = {
   enabled: false,
   server: null,
@@ -26,7 +30,7 @@ function getProxyConfig() {
   const scheme = state.protocol === 'socks5' ? 'socks5' : 'http';
   const portMap = { http: 8080, socks5: 1080, ws: 3001 };
   let port = portMap[state.protocol] || 8080;
-  let host = state.server || 'proxy.securevpn.com';
+  let host = state.server || 'proxy.madavpn.com';
 
   // Apply obfuscation port override
   if (state.obfuscation && state.obfuscationMethod !== 'none' && OBFS_PORTS[state.obfuscationMethod]) {

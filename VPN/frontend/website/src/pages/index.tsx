@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Shield, Globe, Zap, Download, Server, Lock, ChevronRight, Menu, X } from 'lucide-react';
+import {
+  Shield, Globe, Zap, Download, Server, Lock, ChevronRight, Menu, X,
+  Github, Smartphone, Monitor, Chrome, Package, ExternalLink, ArrowRight
+} from 'lucide-react';
 
 const LATENCIES = [67, 73, 73, 69, 27, 51, 63, 104, 85, 102];
 
@@ -15,12 +18,13 @@ export default function LandingPage() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center gap-2">
               <Shield className="h-8 w-8 text-indigo-400" />
-              <span className="text-xl font-bold">SecureVPN</span>
+              <span className="text-xl font-bold">MadaVPN</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-300 hover:text-white transition">Features</a>
+              <a href="#download" className="text-gray-300 hover:text-white transition">Download</a>
               <a href="#servers" className="text-gray-300 hover:text-white transition">Servers</a>
-              <a href="#pricing" className="text-gray-300 hover:text-white transition">Pricing</a>
+              <a href="https://github.com/mada-dev/mada-vpn" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-gray-300 hover:text-white transition"><Github className="h-4 w-4" /> GitHub</a>
               <a href="/dashboard" className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition">Dashboard</a>
             </div>
             <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
@@ -34,20 +38,50 @@ export default function LandingPage() {
         <section className="pt-32 pb-20 px-4">
           <div className="max-w-7xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-4 py-2 text-sm text-indigo-300 mb-8">
-              <Zap className="h-4 w-4" /> Lightning Fast & Secure
+              <Zap className="h-4 w-4" /> Open Source VPN Platform
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">
-              Browse the Internet<br />Without Limits
+              Your Privacy,<br />Your Control
             </h1>
             <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-              Secure, fast, and reliable VPN service. Bypass censorship and protect your privacy with military-grade encryption.
+              Full-stack VPN platform — browser dashboard, Chrome extension, and desktop app.
+              Self-host or use our cloud. 100% open source.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a href="/dashboard" className="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-xl text-lg font-semibold transition flex items-center justify-center gap-2">
-                Get Started Free <ChevronRight className="h-5 w-5" />
+                Open Dashboard <ChevronRight className="h-5 w-5" />
               </a>
-              <a href="#features" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-xl text-lg transition">
-                Learn More
+              <a href="https://github.com/mada-dev/mada-vpn" target="_blank" rel="noopener noreferrer" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-xl text-lg transition flex items-center justify-center gap-2">
+                <Github className="h-5 w-5" /> View on GitHub
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="download" className="py-20 px-4 bg-white/5">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-4">Download MadaVPN</h2>
+            <p className="text-gray-400 text-center mb-12 text-lg">Available on every platform you use</p>
+            <div className="grid md:grid-cols-4 gap-6">
+              {[
+                { icon: <Chrome className="h-8 w-8 text-emerald-400" />, title: 'Chrome Extension', desc: 'Proxy-based VPN in your browser. Install from the Chrome Web Store or load unpacked.', action: 'Install Extension', href: '/downloads#extension' },
+                { icon: <Monitor className="h-8 w-8 text-sky-400" />, title: 'Desktop App (Windows)', desc: 'Full system tray VPN with WireGuard and system proxy. Native Windows app.', action: 'Download .exe', href: '/downloads#windows' },
+                { icon: <Smartphone className="h-8 w-8 text-amber-400" />, title: 'Desktop App (macOS)', desc: 'Native macOS app with menu bar integration and system-wide kill switch.', action: 'Download .dmg', href: '/downloads#macos' },
+                { icon: <Package className="h-8 w-8 text-rose-400" />, title: 'Desktop App (Linux)', desc: 'Linux AppImage for all major distributions. Full WireGuard support.', action: 'Download .AppImage', href: '/downloads#linux' },
+              ].map((item, i) => (
+                <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition flex flex-col">
+                  <div className="mb-4">{item.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
+                  <p className="text-gray-400 text-sm mb-6 flex-grow">{item.desc}</p>
+                  <a href={item.href} className="bg-indigo-600 hover:bg-indigo-700 text-center py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
+                    <Download className="h-4 w-4" /> {item.action}
+                  </a>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <a href="https://github.com/mada-dev/mada-vpn/releases" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-300 transition flex items-center justify-center gap-1">
+                <ExternalLink className="h-4 w-4" /> All releases on GitHub
               </a>
             </div>
           </div>
@@ -55,15 +89,15 @@ export default function LandingPage() {
 
         <section id="features" className="py-20 px-4">
           <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-16">Why Choose SecureVPN?</h2>
+            <h2 className="text-4xl font-bold text-center mb-16">Everything You Need</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { icon: <Globe className="h-8 w-8 text-indigo-400" />, title: 'Global Servers', desc: '100+ servers across 50 countries. Connect to the fastest server near you.' },
-                { icon: <Lock className="h-8 w-8 text-emerald-400" />, title: 'Military-Grade Encryption', desc: 'AES-256 encryption protects all your traffic from prying eyes.' },
-                { icon: <Zap className="h-8 w-8 text-amber-400" />, title: 'Lightning Speed', desc: 'Optimized routing ensures minimal speed loss. Up to 1 Gbps per connection.' },
-                { icon: <Server className="h-8 w-8 text-rose-400" />, title: 'Multi-Protocol', desc: 'HTTP proxy, SOCKS5, WireGuard, and WebSocket tunnel - all in one.' },
-                { icon: <Download className="h-8 w-8 text-sky-400" />, title: 'All Platforms', desc: 'Browser extension, desktop app, and web-based proxy. Use anywhere.' },
-                { icon: <Shield className="h-8 w-8 text-violet-400" />, title: 'No Logs Policy', desc: 'We never log your activity. Your privacy is our top priority.' },
+                { icon: <Globe className="h-8 w-8 text-indigo-400" />, title: '100+ Servers', desc: 'Global network across USA, Europe, Asia, Australia, and South America.' },
+                { icon: <Lock className="h-8 w-8 text-emerald-400" />, title: 'AES-256 + PFS', desc: 'Military-grade encryption with Perfect Forward Secrecy. Keys rotate automatically.' },
+                { icon: <Zap className="h-8 w-8 text-amber-400" />, title: '10 Gbps Ports', desc: 'Massive bandwidth capacity with zero buffering. WireGuard for maximum speed.' },
+                { icon: <Server className="h-8 w-8 text-rose-400" />, title: 'Multi-Protocol', desc: 'HTTP, SOCKS5, WireGuard, WebSocket, OpenVPN, Shadowsocks, and more.' },
+                { icon: <Shield className="h-8 w-8 text-violet-400" />, title: 'Kill Switch + Split Tunnel', desc: 'System-wide kill switch prevents leaks. Route only selected apps through VPN.' },
+                { icon: <Globe className="h-8 w-8 text-cyan-400" />, title: 'Meshnet + Dedicated IP', desc: 'P2P device mesh. Static clean IP for streaming. RAM-only servers.' },
               ].map((f, i) => (
                 <div key={i} className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition">
                   <div className="mb-4">{f.icon}</div>
@@ -75,37 +109,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="pricing" className="py-20 px-4 bg-white/5">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4">Simple Pricing</h2>
-            <p className="text-gray-400 text-center mb-12 text-lg">Choose the plan that fits your needs</p>
-            <div className="grid md:grid-cols-4 gap-6">
-              {[
-                { name: 'Free', price: '$0', gb: '5 GB', devices: '1 Device', speed: '10 Mbps', popular: false },
-                { name: 'Basic', price: '$4.99', gb: '50 GB', devices: '3 Devices', speed: '50 Mbps', popular: false },
-                { name: 'Premium', price: '$9.99', gb: '200 GB', devices: '5 Devices', speed: '100 Mbps', popular: true },
-                { name: 'Enterprise', price: '$29.99', gb: '1 TB', devices: '10 Devices', speed: '500 Mbps', popular: false },
-              ].map((plan, i) => (
-                <div key={i} className={`rounded-2xl p-8 border ${plan.popular ? 'bg-indigo-600 border-indigo-400 scale-105' : 'bg-white/5 border-white/10'} relative`}>
-                  {plan.popular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-black text-sm font-bold px-4 py-1 rounded-full">POPULAR</div>}
-                  <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
-                  <div className="text-4xl font-bold mb-6">{plan.price}<span className="text-lg text-gray-400">/mo</span></div>
-                  <ul className="space-y-3 mb-8">
-                    <li className="flex items-center gap-2"><span className="text-emerald-400">✓</span> {plan.gb} Bandwidth</li>
-                    <li className="flex items-center gap-2"><span className="text-emerald-400">✓</span> {plan.devices}</li>
-                    <li className="flex items-center gap-2"><span className="text-emerald-400">✓</span> {plan.speed}</li>
-                    <li className="flex items-center gap-2"><span className="text-emerald-400">✓</span> All Protocols</li>
-                  </ul>
-                  <a href={plan.price === '$0' ? '/dashboard' : '/dashboard?subscribe=' + plan.name.toLowerCase()} className={`block text-center py-3 rounded-xl font-semibold transition ${plan.popular ? 'bg-white text-indigo-600 hover:bg-gray-100' : 'bg-white/10 hover:bg-white/20'}`}>
-                    {plan.price === '$0' ? 'Get Started' : 'Subscribe'}
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="servers" className="py-20 px-4">
+        <section id="servers" className="py-20 px-4 bg-white/5">
           <div className="max-w-7xl mx-auto text-center">
             <h2 className="text-4xl font-bold mb-6">Global Server Network</h2>
             <p className="text-gray-400 mb-12 text-lg">Connect from anywhere in the world</p>
@@ -119,11 +123,63 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-4">Self-Host or Use Cloud</h2>
+            <p className="text-gray-400 mb-8 text-lg">
+              MadaVPN is fully open source. Deploy your own instance or use our hosted version.
+              The backend runs on Python/FastAPI, the frontend on Next.js.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a href="/dashboard" className="bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-xl text-lg font-semibold transition flex items-center justify-center gap-2">
+                Launch Dashboard <ArrowRight className="h-5 w-5" />
+              </a>
+              <a href="https://github.com/mada-dev/mada-vpn" target="_blank" rel="noopener noreferrer" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-xl text-lg transition flex items-center justify-center gap-2">
+                <Github className="h-5 w-5" /> Clone from GitHub
+              </a>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-white/10 py-12 px-4">
-        <div className="max-w-7xl mx-auto text-center text-gray-500">
-          <p suppressHydrationWarning>© {new Date().getFullYear()} SecureVPN. All rights reserved. Built for privacy and freedom.</p>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="h-6 w-6 text-indigo-400" />
+                <span className="font-bold">MadaVPN</span>
+              </div>
+              <p className="text-gray-500 text-sm">Open source VPN platform. Privacy-first, zero compromises.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3">Platform</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><a href="/dashboard" className="hover:text-white transition">Dashboard</a></li>
+                <li><a href="#download" className="hover:text-white transition">Downloads</a></li>
+                <li><a href="#features" className="hover:text-white transition">Features</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3">Developers</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><a href="https://github.com/mada-dev/mada-vpn" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">GitHub</a></li>
+                <li><a href="https://github.com/mada-dev/mada-vpn/issues" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Report Issue</a></li>
+                <li><a href="https://github.com/mada-dev/mada-vpn/blob/main/README.md" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">Documentation</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3">Legal</h4>
+              <ul className="space-y-2 text-sm text-gray-500">
+                <li><span className="hover:text-white transition cursor-pointer">Privacy Policy</span></li>
+                <li><span className="hover:text-white transition cursor-pointer">Terms of Service</span></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-8 text-center text-gray-500 text-sm">
+            <p suppressHydrationWarning>© {new Date().getFullYear()} MadaVPN. Open source. Built for privacy and freedom.</p>
+          </div>
         </div>
       </footer>
     </div>

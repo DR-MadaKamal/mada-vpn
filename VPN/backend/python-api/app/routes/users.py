@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.core.database import get_db
 from app.core.security import get_current_user, get_password_hash
+from app.core.webhook_events import fire_webhook
 from app.models.user import User
 
 router = APIRouter()
@@ -357,6 +358,26 @@ async def set_multi_hop(
 
 
 # --- Config Export ---
+def _generate_wireguard_keypair():
+    from cryptography.hazmat.primitives.asymmetric import x25519
+    from cryptography.hazmat.primitives import serialization
+    private_key = x25519.X25519PrivateKey.generate()
+    private_bytes = private_key.private_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PrivateFormat.Raw,
+        encryption_algorithm=serialization.NoEncryption(),
+    )
+    public_key = private_key.public_key()
+    public_bytes = public_key.public_bytes(
+        encoding=serialization.Encoding.Raw,
+        format=serialization.PublicFormat.Raw,
+    )
+    import base64
+    def wg_base64(key_bytes):
+        return base64.b64encode(key_bytes).decode().rstrip("=")
+    return wg_base64(private_bytes), wg_base64(public_bytes)
+
+
 @router.get("/config/{server_id}/{protocol}")
 async def export_config(
     server_id: int,
@@ -370,9 +391,10 @@ async def export_config(
         raise HTTPException(status_code=404, detail="Server not found")
     ports = {"http": 8080, "socks5": 1080, "wireguard": 51820, "ws": 3001, "openvpn": 1194}
     port = ports.get(protocol, 8080)
+    priv, pub = _generate_wireguard_keypair()
     configs = {
         "openvpn": f"client\ndev tun\nproto tcp\nremote {server.host} {port}\nresolv-retry infinite\nnobind\npersist-key\npersist-tun\nca ca.crt\nauth-user-pass /etc/openvpn/auth.txt\ncomp-lzo\nverb 3\n",
-        "wireguard": f"[Interface]\nPrivateKey = YOUR_PRIVATE_KEY\nAddress = 10.0.0.2/32\nDNS = 1.1.1.1\n\n[Peer]\nPublicKey = {server.public_key or 'SERVER_PUBLIC_KEY'}\nEndpoint = {server.host}:{port}\nAllowedIPs = 0.0.0.0/0\nPersistentKeepalive = 25\n",
+        "wireguard": f"[Interface]\nPrivateKey = {priv}\nAddress = 10.0.0.2/32\nDNS = 1.1.1.1\n\n[Peer]\nPublicKey = {pub}\nEndpoint = {server.host}:{port}\nAllowedIPs = 0.0.0.0/0\nPersistentKeepalive = 25\n",
         "http": f"export http_proxy=http://{server.host}:{port}\nexport https_proxy=http://{server.host}:{port}",
         "socks5": f"export ALL_PROXY=socks5://{server.host}:{port}",
         "ws": f"WebSocket tunnel endpoint: ws://{server.host}:{port}/tunnel\nUse with wstunnel or similar client.",
@@ -385,6 +407,8 @@ async def export_config(
         "host": server.host,
         "port": port,
         "config_body": body,
+        "wireguard_private_key": priv if protocol == "wireguard" else None,
+        "wireguard_public_key": pub if protocol == "wireguard" else None,
     }
 
 
@@ -555,13 +579,14 @@ async def wireguard_qr(
     server = db.query(Server).filter(Server.id == server_id).first()
     if not server:
         raise HTTPException(status_code=404, detail="Server not found")
+    priv, pub = _generate_wireguard_keypair()
     config = f"""[Interface]
-PrivateKey = YOUR_PRIVATE_KEY
+PrivateKey = {priv}
 Address = 10.0.0.2/32
 DNS = {current_user.dns_servers.split(',')[0] if current_user.dns_servers else '1.1.1.1'}
 
 [Peer]
-PublicKey = {server.public_key or 'SERVER_PUBLIC_KEY'}
+PublicKey = {pub}
 Endpoint = {server.host}:51820
 AllowedIPs = 0.0.0.0/0
 PersistentKeepalive = 25"""
@@ -572,9 +597,9 @@ PersistentKeepalive = 25"""
         buf = BytesIO()
         qr.save(buf, format="PNG")
         b64 = base64.b64encode(buf.getvalue()).decode()
-        return {"qr_base64": b64, "config": config, "server": server.name}
+        return {"qr_base64": b64, "config": config, "server": server.name, "private_key": priv, "public_key": pub}
     except ImportError:
-        return {"qr_base64": "", "config": config, "server": server.name, "note": "Install qrcode[pil] for QR generation"}
+        return {"qr_base64": "", "config": config, "server": server.name, "private_key": priv, "public_key": pub, "note": "Install qrcode[pil] for QR generation"}
 
 
 # --- Service Health ---
@@ -1426,7 +1451,28 @@ async def set_last_connected(
     current_user.last_connected_server_id = data.get("server_id", 0)
     current_user.last_connected_at = func.now()
     db.commit()
-    return {"message": "Updated"}
+    import asyncio
+    asyncio.create_task(fire_webhook(
+        current_user.webhook_url, "connect", current_user.id,
+        {"server_id": current_user.last_connected_server_id}
+    ))
+    return {"message": "Updated", "server_id": current_user.last_connected_server_id}
+
+
+@router.post("/disconnect")
+async def disconnect(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    import asyncio
+    asyncio.create_task(fire_webhook(
+        current_user.webhook_url, "disconnect", current_user.id,
+        {"server_id": current_user.last_connected_server_id}
+    ))
+    current_user.last_connected_server_id = 0
+    current_user.last_connected_at = None
+    db.commit()
+    return {"message": "Disconnected"}
 
 
 # --- Trial ---

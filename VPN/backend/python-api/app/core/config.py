@@ -6,6 +6,12 @@ class Settings(BaseSettings):
     APP_NAME: str = "SecureVPN"
     DATABASE_URL: str = "sqlite:///./vpn.db"
     JWT_SECRET: str = "change-this-in-production"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if self.JWT_SECRET == "change-this-in-production":
+            import warnings
+            warnings.warn("JWT_SECRET is still set to default! Set JWT_SECRET env var in production.")
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30

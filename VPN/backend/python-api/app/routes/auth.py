@@ -1,3 +1,5 @@
+import uuid
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -7,9 +9,10 @@ from app.core.security import (
     verify_password, get_password_hash, create_access_token,
     create_refresh_token, get_current_user
 )
-from app.models.user import User
+from app.models.user import User, EmailVerificationToken, UsedRefreshToken
 import jwt
 from app.core.config import settings
+from app.core.webhook_events import fire_webhook
 
 router = APIRouter()
 
@@ -34,6 +37,7 @@ class UserResponse(BaseModel):
     full_name: str
     tier: str
     is_active: bool
+    email_verified: bool = False
 
     class Config:
         from_attributes = True
@@ -55,6 +59,17 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    # Send verification email (simulated)
+    token_str = uuid.uuid4().hex
+    verif = EmailVerificationToken(
+        user_id=user.id,
+        token=token_str,
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=48),
+    )
+    db.add(verif)
+    user.email_verification_token = token_str
+    db.commit()
 
     return TokenResponse(
         access_token=create_access_token({"sub": str(user.id)}),
@@ -83,15 +98,50 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh_token(refresh_token: str, db: Session = Depends(get_db)):
+async def refresh_token(refresh_token_str: str, db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(refresh_token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(refresh_token_str, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
         if payload.get("type") != "refresh":
             raise HTTPException(status_code=400, detail="Invalid refresh token")
         user_id = payload.get("sub")
+        jti = payload.get("jti", refresh_token_str[:32])
+
+        # Check if this refresh token was already used (rotation)
+        already_used = db.query(UsedRefreshToken).filter(
+            UsedRefreshToken.token_jti == jti
+        ).first()
+        if already_used:
+            # Token reuse detected — revoke all sessions for this user
+            db.query(UsedRefreshToken).filter(
+                UsedRefreshToken.user_id == int(user_id)
+            ).delete()
+            db.query(EmailVerificationToken).filter(
+                EmailVerificationToken.user_id == int(user_id)
+            ).delete()
+            user_obj = db.query(User).filter(User.id == int(user_id)).first()
+            if user_obj:
+                user_obj.is_active = False
+            db.commit()
+            raise HTTPException(status_code=401, detail="Refresh token reused — account locked")
+
+        # Mark old refresh as used
+        old = UsedRefreshToken(
+            user_id=int(user_id),
+            token_jti=jti,
+            expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        )
+        db.add(old)
+
         user = db.query(User).filter(User.id == int(user_id)).first()
         if not user or not user.is_active:
             raise HTTPException(status_code=403, detail="Account disabled")
+
+        # Clean up expired used tokens
+        db.query(UsedRefreshToken).filter(
+            UsedRefreshToken.expires_at < datetime.now(timezone.utc)
+        ).delete()
+        db.commit()
+
         return TokenResponse(
             access_token=create_access_token({"sub": str(user.id), "tier": user.tier}),
             refresh_token=create_refresh_token(user.id),
@@ -130,6 +180,53 @@ async def verify_token(token_data: dict, db: Session = Depends(get_db)):
             "expires_at": payload.get("exp"),
             "quota_bytes": user.quota_bytes,
             "bytes_used": total_used,
+            "email_verified": user.email_verified,
         }
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+# --- Email Verification ---
+
+@router.get("/verify-email/{token}")
+async def verify_email(token: str, db: Session = Depends(get_db)):
+    verif = db.query(EmailVerificationToken).filter(
+        EmailVerificationToken.token == token,
+        EmailVerificationToken.used == False,
+    ).first()
+    if not verif:
+        raise HTTPException(status_code=404, detail="Invalid or expired verification token")
+    if verif.expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Verification token expired")
+    user = db.query(User).filter(User.id == verif.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.email_verified = True
+    user.email_verification_token = ""
+    verif.used = True
+    db.commit()
+    return {"message": "Email verified successfully"}
+
+
+@router.post("/resend-verification")
+async def resend_verification(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.email_verified:
+        raise HTTPException(status_code=400, detail="Email already verified")
+    token_str = uuid.uuid4().hex
+    verif = EmailVerificationToken(
+        user_id=current_user.id,
+        token=token_str,
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=48),
+    )
+    db.add(verif)
+    current_user.email_verification_token = token_str
+    db.commit()
+    return {"message": "Verification email resent", "token": token_str}
+
+
+@router.get("/verification-status")
+async def verification_status(current_user: User = Depends(get_current_user)):
+    return {"email_verified": current_user.email_verified}

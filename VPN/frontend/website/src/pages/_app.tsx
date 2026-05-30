@@ -9,8 +9,12 @@ export default function App({ Component, pageProps }: AppProps) {
     <AuthProvider>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>SecureVPN - Browse Without Limits</title>
-        <meta name="description" content="Secure, fast, and reliable VPN service. Bypass censorship and protect your privacy." />
+        <title>MadaVPN - Open Source VPN Platform</title>
+        <meta name="description" content="Full-stack open source VPN platform. Browser dashboard, Chrome extension, and desktop app. Self-host or use cloud." />
+        <meta property="og:title" content="MadaVPN - Open Source VPN Platform" />
+        <meta property="og:description" content="Full-stack open source VPN platform with 50+ features." />
+        <meta property="og:type" content="website" />
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
       </Head>
       <Component {...pageProps} />
       <Toaster position="top-right" toastOptions={{
