@@ -107,6 +107,7 @@ async def seed_database(
 
     if db.query(Server).count() == 0:
         seed_servers = [
+            Server(name="Germany-Proxy", host="madavpn-proxy.germanywestcentral.azurecontainer.io", ip_address="20.79.129.27", country="Germany", city="Frankfurt", latitude=50.1109, longitude=8.6821, load_percent=12, connected_clients=0, max_clients=500, protocols="http", is_active=True),
             Server(name="US-East-1", host="us-east.securevpn.com", ip_address="10.0.1.1", country="USA", city="New York", latitude=40.7128, longitude=-74.0060, load_percent=34, connected_clients=156, max_clients=1000, protocols="http,socks5,wireguard"),
             Server(name="US-West-1", host="us-west.securevpn.com", ip_address="10.0.1.2", country="USA", city="Los Angeles", latitude=34.0522, longitude=-118.2437, load_percent=52, connected_clients=234, max_clients=1000, protocols="http,socks5,wireguard,ws"),
             Server(name="EU-West-1", host="eu-west.securevpn.com", ip_address="10.0.2.1", country="UK", city="London", latitude=51.5074, longitude=-0.1278, load_percent=28, connected_clients=89, max_clients=1000, protocols="http,socks5,wireguard"),

@@ -5,60 +5,76 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { width: 360px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #fff; }
-    .container { padding: 20px; }
-    .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-    .header .logo { width: 36px; height: 36px; background: #6366f1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .header h1 { font-size: 18px; font-weight: 700; }
-    .status-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 16px; }
-    .status-card .status-icon { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
-    .status-card .disconnected { background: rgba(100, 116, 139, 0.2); color: #64748b; }
-    .status-card .status-text { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .status-card .status-sub { font-size: 12px; color: #94a3b8; }
-    .btn-primary { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: #6366f1; color: #fff; }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-secondary { width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 13px; cursor: pointer; background: transparent; color: #94a3b8; transition: all 0.2s; margin-top: 8px; }
-    .btn-secondary:hover { background: rgba(255,255,255,0.05); color: #fff; }
-    .info-box { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 10px; padding: 12px; margin: 12px 0; font-size: 12px; color: #94a3b8; line-height: 1.5; }
-    .footer { margin-top: 16px; display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; }
-    .footer a { color: #64748b; font-size: 12px; text-decoration: none; cursor: pointer; }
-    .footer a:hover { color: #94a3b8; }
-    .server-list { margin-top: 12px; }
-    .server-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
-    .server-item:hover { background: rgba(255,255,255,0.06); }
-    .server-item .name { font-size: 13px; font-weight: 500; }
-    .server-item .load { font-size: 11px; color: #64748b; }
-    .server-item .load-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-    .server-item .load-bar .fill { height: 100%; border-radius: 2px; }
+    body { width: 320px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #fff; }
+    .container { padding: 24px 20px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo svg { width: 28px; height: 28px; }
+    .logo span { font-size: 17px; font-weight: 700; }
+    .header-links { display: flex; gap: 8px; }
+    .header-links a { color: #64748b; font-size: 16px; text-decoration: none; cursor: pointer; }
+    .header-links a:hover { color: #94a3b8; }
+    .status-circle { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; user-select: none; }
+    .status-circle.disconnected { background: conic-gradient(#334155 0deg 360deg); box-shadow: 0 0 40px rgba(51,65,85,0.3); }
+    .status-circle.connecting { background: conic-gradient(#6366f1 0deg, #334155 0deg 360deg); animation: spin 1s linear infinite; box-shadow: 0 0 40px rgba(99,102,241,0.2); }
+    .status-circle.connected { background: conic-gradient(#22c55e 0deg 360deg); box-shadow: 0 0 40px rgba(34,197,94,0.3); }
+    @keyframes spin { to { filter: hue-rotate(360deg); } }
+    .status-circle .icon { font-size: 36px; line-height: 1; }
+    .status-circle .label { font-size: 12px; font-weight: 600; margin-top: 4px; }
+    .status-circle .sub-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .key { font-size: 12px; color: #64748b; }
+    .info-row .value { font-size: 12px; color: #e2e8f0; font-weight: 500; }
+    .info-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 4px 12px; margin-top: 16px; }
+    .error-msg { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 8px 12px; font-size: 12px; margin-top: 12px; display: none; }
+    .footer { margin-top: 16px; text-align: center; }
+    .footer a { color: #475569; font-size: 11px; text-decoration: none; cursor: pointer; }
+    .footer a:hover { color: #64748b; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">🛡</div>
-      <h1>MadaVPN</h1>
+      <div class="logo">
+        <svg viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" stroke="#6366f1" stroke-width="2.5"/><path d="M10 14l3 3 5-5" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>MadaVPN</span>
+      </div>
+      <div class="header-links">
+        <a href="#" id="openSettings" title="Settings">⚙️</a>
+        <a href="#" id="openDashboard" title="Dashboard">📊</a>
+      </div>
     </div>
 
-    <div class="status-card">
-      <div id="statusIcon" class="status-icon disconnected">🔴</div>
-      <div id="statusText" class="status-text">Dashboard Companion</div>
-      <div id="statusSub" class="status-sub">Manage your account and servers</div>
+    <div id="statusCircle" class="status-circle disconnected">
+      <div class="icon">🔒</div>
+      <div class="label">Disconnected</div>
+      <div class="sub-label">Tap to connect</div>
     </div>
 
-    <button id="openDashboardBtn" class="btn-primary">Open Dashboard</button>
-
-    <div class="info-box">
-      <strong>🛡 Proxy servers coming soon.</strong><br>
-      Proxy server infrastructure is not yet deployed. This extension currently
-      serves as a quick-launch companion for your MadaVPN dashboard where you
-      can browse servers, check usage, and manage settings.
+    <div class="info-card">
+      <div class="info-row">
+        <span class="key">Server</span>
+        <span class="value" id="serverName">Auto</span>
+      </div>
+      <div class="info-row">
+        <span class="key">Location</span>
+        <span class="value" id="serverLocation">—</span>
+      </div>
+      <div class="info-row">
+        <span class="key">Protocol</span>
+        <span class="value">HTTP CONNECT</span>
+      </div>
+      <div class="info-row">
+        <span class="key">Status</span>
+        <span class="value" id="connectionStatus">Off</span>
+      </div>
     </div>
 
-    <div id="serverList" class="server-list"></div>
+    <div id="errorMsg" class="error-msg"></div>
 
     <div class="footer">
-      <a href="#" id="openOptions">⚙️ Settings</a>
-      <a href="#" id="openDashboard">📊 Dashboard</a>
+      <a href="#" id="openOptions">Settings</a>
     </div>
   </div>
   <script src="popup.js"></script>
